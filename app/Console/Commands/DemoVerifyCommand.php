@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\AI\Audit\AuditLog;
 use App\AI\Transport\FixtureTransport;
 use App\AI\Transport\LlmTransport;
 use App\Support\DemoPrinter;
@@ -75,6 +76,23 @@ class DemoVerifyCommand extends Command
                 'arguments' => ['--max-iterations' => 2],
                 'expect' => ['the iteration cap of 2 was reached'],
             ],
+            // These three run in order on purpose: the agent requests the
+            // refund, the human releases it, the audit shows both halves.
+            [
+                'command' => 'demo:agent',
+                'arguments' => ['--scenario' => 'refund'],
+                'expect' => ['HIGH IMPACT', 'pending_approval', 'demo:approve 1'],
+            ],
+            [
+                'command' => 'demo:approve',
+                'arguments' => ['id' => 1],
+                'expect' => ['₹50,000', 're_3VikramNairCC0001', 'REFUND RELEASED'],
+            ],
+            [
+                'command' => 'demo:audit',
+                'arguments' => [],
+                'expect' => ['RUNS RECORDED', 'demo:approve', 'refund_payment'],
+            ],
         ];
     }
 
@@ -141,6 +159,8 @@ class DemoVerifyCommand extends Command
         if ($transport instanceof FixtureTransport) {
             $transport->rewind();
         }
+
+        app(AuditLog::class)->newRun();
 
         // The buffer is passed in explicitly. Some demo commands reset the
         // database with a nested Artisan call, which would otherwise replace the

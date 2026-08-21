@@ -16,6 +16,21 @@ final class GetPayments implements Tool
         return 'get_payments';
     }
 
+    public function impact(): ToolImpact
+    {
+        return ToolImpact::Read;
+    }
+
+    public function permission(): string
+    {
+        return 'payments.read';
+    }
+
+    public function approvalPermission(): ?string
+    {
+        return null;
+    }
+
     public function description(): string
     {
         return 'List every payment taken from one customer, oldest first. Returns the amount, the '

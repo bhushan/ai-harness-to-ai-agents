@@ -1,0 +1,28 @@
+{
+    "id": "msg_01AgentRefundRequest002",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-opus-5",
+    "content": [
+        {
+            "type": "text",
+            "text": "Vikram Nair, Enterprise plan, with us since November. Now the payments, so I know exactly what a refund would be against."
+        },
+        {
+            "type": "tool_use",
+            "id": "toolu_01AgentGetPaymentsVikram",
+            "name": "get_payments",
+            "input": {
+                "customer_id": 3
+            }
+        }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+        "input_tokens": 1088,
+        "output_tokens": 84,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0
+    }
+}

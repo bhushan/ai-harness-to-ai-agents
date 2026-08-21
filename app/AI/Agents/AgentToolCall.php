@@ -2,6 +2,7 @@
 
 namespace App\AI\Agents;
 
+use App\AI\Tools\ToolImpact;
 use App\AI\Tools\ToolResult;
 
 final class AgentToolCall
@@ -12,6 +13,7 @@ final class AgentToolCall
     public function __construct(
         public readonly string $id,
         public readonly string $tool,
+        public readonly ToolImpact $impact,
         public readonly array $input,
         public readonly ToolResult $result,
     ) {}

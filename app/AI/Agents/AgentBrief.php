@@ -2,6 +2,7 @@
 
 namespace App\AI\Agents;
 
+use App\AI\Tools\Actor;
 use App\Models\Customer;
 
 /**
@@ -11,10 +12,19 @@ use App\Models\Customer;
  */
 final class AgentBrief
 {
+    /**
+     * Who the agent is acting as. It never holds more permission than the
+     * person it stands in for.
+     */
+    public readonly Actor $actor;
+
     public function __construct(
         public readonly string $goal,
         public readonly Customer $customer,
         public readonly string $scenario,
         public readonly int $maxIterations = 8,
-    ) {}
+        ?Actor $actor = null,
+    ) {
+        $this->actor = $actor ?? Actor::assistant();
+    }
 }

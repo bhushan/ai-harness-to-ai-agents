@@ -17,6 +17,23 @@ interface Tool
     public function name(): string;
 
     /**
+     * What this tool can do to the world. Decides whether it runs when asked,
+     * or only ever gets requested.
+     */
+    public function impact(): ToolImpact;
+
+    /**
+     * The permission an actor must hold to call this tool at all.
+     */
+    public function permission(): string;
+
+    /**
+     * For high impact tools, the permission required to approve and actually
+     * carry the action out. Null for everything that runs when asked.
+     */
+    public function approvalPermission(): ?string;
+
+    /**
      * Written for the model, not for a README. Say what it returns and when to
      * reach for it, because this text is most of what decides whether the model
      * picks the right tool.

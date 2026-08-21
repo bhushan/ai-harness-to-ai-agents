@@ -14,7 +14,9 @@ class Payment extends Model
     {
         return [
             'amount_paise' => 'integer',
+            'refunded_amount_paise' => 'integer',
             'paid_at' => 'datetime',
+            'refunded_at' => 'datetime',
         ];
     }
 
@@ -31,5 +33,10 @@ class Payment extends Model
     public function amountFormatted(): string
     {
         return Money::inr($this->amount_paise);
+    }
+
+    public function isRefunded(): bool
+    {
+        return $this->refunded_at !== null;
     }
 }

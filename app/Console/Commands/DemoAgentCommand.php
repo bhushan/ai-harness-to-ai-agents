@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\AI\Agents\Agent;
 use App\AI\Agents\AgentBrief;
 use App\AI\Agents\AgentIteration;
+use App\AI\Audit\AuditLog;
 use App\Models\Customer;
 use App\Support\DemoDatabase;
 use App\Support\DemoPrinter;
@@ -16,7 +17,7 @@ use Illuminate\Console\Command;
 class DemoAgentCommand extends Command
 {
     protected $signature = 'demo:agent
-        {--goal=Handle this customer\'s billing issue : What the agent is asked to achieve}
+        {--goal= : What the agent is asked to achieve, if not the default for the scenario}
         {--scenario=double-charge : Which situation to run}
         {--max-iterations=8 : Hard cap on turns of the loop}';
 
@@ -29,11 +30,24 @@ class DemoAgentCommand extends Command
      * @var array<string, array{scenario: string, customer: int}>
      */
     private const SITUATIONS = [
-        'double-charge' => ['scenario' => 'agent-double-charge', 'customer' => 1],
-        'legitimate' => ['scenario' => 'agent-legitimate', 'customer' => 2],
+        'double-charge' => [
+            'scenario' => 'agent-double-charge',
+            'customer' => 1,
+            'goal' => "Handle this customer's billing issue",
+        ],
+        'legitimate' => [
+            'scenario' => 'agent-legitimate',
+            'customer' => 2,
+            'goal' => "Handle this customer's billing issue",
+        ],
+        'refund' => [
+            'scenario' => 'agent-refund',
+            'customer' => 3,
+            'goal' => 'This customer has asked for their enterprise payment to be refunded. Sort it out.',
+        ],
     ];
 
-    public function handle(Agent $agent): int
+    public function handle(Agent $agent, AuditLog $audit): int
     {
         $printer = DemoPrinter::for($this->output);
 
@@ -51,8 +65,10 @@ class DemoAgentCommand extends Command
         // Reset first, so the ticket the agent opens is #1 on every run.
         DemoDatabase::reset();
 
+        $audit->useContext('demo:agent --scenario='.$situation);
+
         $brief = new AgentBrief(
-            goal: (string) $this->option('goal'),
+            goal: (string) ($this->option('goal') ?: self::SITUATIONS[$situation]['goal']),
             customer: Customer::findOrFail(self::SITUATIONS[$situation]['customer']),
             scenario: self::SITUATIONS[$situation]['scenario'],
             maxIterations: (int) $this->option('max-iterations'),
@@ -63,7 +79,8 @@ class DemoAgentCommand extends Command
         $printer->section('THE BRIEF', '', 'blue;options=bold');
         $printer->kv('goal', $brief->goal);
         $printer->kv('customer', $brief->customer->name.' (id '.$brief->customer->id.')');
-        $printer->kv('tools available', 'get_customer, get_orders, get_payments, create_ticket');
+        $printer->kv('acting as', $brief->actor->name);
+        $printer->kv('permissions', implode(', ', $brief->actor->permissions));
         $printer->kv('iteration cap', (string) $brief->maxIterations);
         $printer->blank();
         $printer->note('There is no list of steps. Nobody wrote down which tool to call first.');
@@ -82,7 +99,7 @@ class DemoAgentCommand extends Command
             }
 
             foreach ($iteration->toolCalls as $call) {
-                $printer->toolCall($call->tool, $call->input);
+                $printer->toolCall($call->tool.'   ['.$call->impact->label().']', $call->input);
 
                 if ($call->result->isError) {
                     $printer->section('RESULT', 'failed', 'red;options=bold');
@@ -124,6 +141,9 @@ class DemoAgentCommand extends Command
         $printer->blank();
         $printer->bullet('The cap is hard, and every decision is in the transcript. That is');
         $printer->note('   what makes a loop like this safe enough to run.');
+        $printer->blank();
+        $printer->bullet('Every tool call above is in the audit table:');
+        $printer->note('   php artisan demo:audit');
         $printer->blank();
 
         return self::SUCCESS;

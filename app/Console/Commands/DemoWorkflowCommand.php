@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\AI\Audit\AuditLog;
 use App\AI\Workflows\DoubleChargeWorkflow;
 use App\AI\Workflows\WorkflowStep;
 use App\Support\DemoDatabase;
@@ -17,12 +18,14 @@ class DemoWorkflowCommand extends Command
 
     protected $description = 'Run a hardcoded pipeline over the tools: check customer, payments, orders, open a ticket';
 
-    public function handle(DoubleChargeWorkflow $workflow): int
+    public function handle(DoubleChargeWorkflow $workflow, AuditLog $audit): int
     {
         $printer = DemoPrinter::for($this->output);
 
         // Reset first so the ticket id is the same on every run.
         DemoDatabase::reset();
+
+        $audit->useContext('demo:workflow');
 
         $printer->title('Step 4: the workflow', 'A sequence I wrote, running over the same four tools');
 

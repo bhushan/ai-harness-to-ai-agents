@@ -43,6 +43,11 @@ class DemoVerifyCommand extends Command
                 'arguments' => [],
                 'expect' => ['SYSTEM PROMPT', 'CONTEXT', 'Priya Sharma', 'payment records'],
             ],
+            [
+                'command' => 'demo:tools',
+                'arguments' => [],
+                'expect' => ['"tools"', 'tool_use', 'get_payments', 'tool_result', 'payment 123', 'payment 124'],
+            ],
         ];
     }
 

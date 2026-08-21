@@ -16,6 +16,9 @@ final class MessagesRequest
     /** @var array<int, array<string, mixed>> */
     private array $messages = [];
 
+    /** @var array<int, array<string, mixed>> */
+    private array $tools = [];
+
     public static function make(): self
     {
         return new self;
@@ -25,6 +28,17 @@ final class MessagesRequest
     {
         $clone = clone $this;
         $clone->system = $system;
+
+        return $clone;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $tools  Tool schemas, as the API wants them.
+     */
+    public function withTools(array $tools): self
+    {
+        $clone = clone $this;
+        $clone->tools = $tools;
 
         return $clone;
     }
@@ -67,6 +81,10 @@ final class MessagesRequest
         // as no system prompt, and the audience should see the difference.
         if ($this->system !== null) {
             $payload['system'] = $this->system;
+        }
+
+        if ($this->tools !== []) {
+            $payload['tools'] = $this->tools;
         }
 
         $payload['messages'] = $this->messages;

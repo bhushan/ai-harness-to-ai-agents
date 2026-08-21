@@ -1,7 +1,160 @@
 <?php
 
+use App\AI\AnthropicClient;
+use App\AI\MessagesRequest;
+use App\AI\Transport\LlmTransport;
+use App\Billing\StripeGateway;
+use App\Models\Customer;
+use App\Models\Payment;
+use App\Support\DemoDatabase;
+use App\Support\DemoDump;
+use App\AI\Harness\SupportHarness;
+use App\Console\Commands\DemoHarnessCommand;
+use App\Console\Commands\DemoLlmCommand;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
+/*
+|------------------------------------------------------------------------------
+| The walkthrough
+|------------------------------------------------------------------------------
+|
+| One route per teaching step, each one a dd() of the things worth looking at.
+| The artisan commands tell the story in sequence; these routes open the hood,
+| so a payload can be expanded and collapsed at the speed of the room.
+|
+| Run php artisan serve and start at http://localhost:8000.
+|
+*/
+
+$steps = [
+    [
+        'url' => '/step-0',
+        'title' => 'Setup',
+        'blurb' => 'The scenario in SQLite, and the two fixture backed transports that replace the network.',
+        'command' => 'php artisan demo:data',
+    ],
+    [
+        'url' => '/step-1',
+        'title' => 'The model on its own',
+        'blurb' => 'A question and nothing else. Three fields go out, and a competent answer about nobody comes back.',
+        'command' => 'php artisan demo:llm',
+    ],
+    [
+        'url' => '/step-2',
+        'title' => 'The harness',
+        'blurb' => 'Instructions plus context. The answer improves without the model changing, and then admits what it cannot see.',
+        'command' => 'php artisan demo:harness',
+    ],
+];
+
+Route::get('/step-0', function (LlmTransport $transport, StripeGateway $gateway) {
+    // This route doubles as the reset button: it puts the database back to the
+    // seeded scenario, so a demo can always be started again from here.
+    DemoDatabase::reset();
+
+    return DemoDump::these([
+        '1. the customer at the centre of the talk' => Customer::findOrFail(1),
+
+        '2. her payments: same order, three seconds apart' => Payment::with('order')
+            ->where('customer_id', 1)
+            ->orderBy('id')
+            ->get(),
+
+        // Expand this one. There is no base URL, no client, no key: just a
+        // directory of files and a counter.
+        '3. what stands in for api.anthropic.com' => $transport,
+
+        '4. the scenarios it can serve' => array_map(
+            'basename',
+            glob(config('demo.fixtures.llm').'/*') ?: []
+        ),
+
+        // A real Stripe charge object, shape for shape, from a committed file.
+        '5. the gateway record behind payment 124' => $gateway->retrieveCharge('ch_3PriyaSharmaAA0002'),
+    ]);
+});
+
+Route::get('/step-1', function (AnthropicClient $client) {
+    $response = $client->send(
+        DemoLlmCommand::SCENARIO,
+        MessagesRequest::make()->withUserMessage(DemoLlmCommand::QUESTION)
+    );
+
+    return DemoDump::these([
+        // Three keys. This is the entire input the model gets.
+        '1. the request, exactly as it goes to /v1/messages' => $response->request(),
+
+        // A real Messages API response: content blocks, stop_reason, usage.
+        '2. the raw response' => $response->raw(),
+
+        '3. the answer on its own' => $response->text(),
+
+        // Search this for Priya, or 999, or 123. They are not there, and they
+        // cannot be: nothing in the request said they exist.
+        '4. what the answer never mentions' => ['Priya Sharma', '₹999', 'payment 123', 'ORD-2201'],
+    ]);
+});
+
+Route::get('/step-2', function (AnthropicClient $client) {
+    DemoDatabase::ensure();
+
+    $harness = new SupportHarness($client);
+    $customer = Customer::findOrFail(1);
+
+    $response = $harness->ask(DemoHarnessCommand::SCENARIO, DemoHarnessCommand::QUESTION, $customer);
+
+    return DemoDump::these([
+        '1. the instructions half of the harness' => $harness->systemPrompt(),
+
+        // Who the customer is. Deliberately not what they paid.
+        '2. the context half' => $harness->customerContext($customer),
+
+        '3. the assembled request' => $response->request(),
+
+        '4. the answer, which now knows her name' => $response->text(),
+
+        // This is sitting in SQLite the whole time. The model cannot see it,
+        // because nothing in the harness went and fetched it.
+        '5. what a tool would have had to return' => Payment::with('order')
+            ->where('customer_id', $customer->id)
+            ->orderBy('id')
+            ->get(),
+    ]);
+});
+
+Route::get('/', function () use ($steps) {
+    $rows = collect($steps)->map(fn (array $step) => <<<HTML
+        <li>
+            <a href="{$step['url']}">{$step['url']}</a>
+            <h2>{$step['title']}</h2>
+            <p>{$step['blurb']}</p>
+            <code>{$step['command']}</code>
+        </li>
+        HTML)->implode('');
+
+    return <<<HTML
+        <!doctype html>
+        <meta charset="utf-8">
+        <title>From AI harness to AI agents</title>
+        <style>
+            :root { color-scheme: dark }
+            body { background: #16161a; color: #e8e8ea; font: 18px/1.6 ui-sans-serif, system-ui, sans-serif;
+                   margin: 0; padding: 4rem 2rem; display: flex; justify-content: center }
+            main { width: min(56rem, 100%) }
+            h1 { font-size: 2.4rem; margin: 0 0 .4rem }
+            .lede { color: #9a9aa2; margin: 0 0 3rem; font-size: 1.1rem }
+            ol { list-style: none; margin: 0; padding: 0 }
+            li { border-top: 1px solid #2a2a31; padding: 1.6rem 0 }
+            a { color: #7dd3fc; font-size: 1.6rem; text-decoration: none; font-family: ui-monospace, monospace }
+            a:hover { text-decoration: underline }
+            h2 { font-size: 1.15rem; margin: .4rem 0 .2rem; font-weight: 600 }
+            p { margin: 0 0 .7rem; color: #b9b9c2 }
+            code { color: #86efac; font-family: ui-monospace, monospace; font-size: .95rem }
+        </style>
+        <main>
+            <h1>From AI harness to AI agents</h1>
+            <p class="lede">One route per step. Everything below runs offline, from committed fixtures.</p>
+            <ol>{$rows}</ol>
+        </main>
+        HTML;
 });

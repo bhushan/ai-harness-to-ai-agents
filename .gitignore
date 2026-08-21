@@ -25,3 +25,6 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# The talk script is personal notes, not part of the demo. Never commit it.
+script.md

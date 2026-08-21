@@ -127,6 +127,9 @@ final class Agent
             conclusion: $conclusion,
             stoppedBecause: $stoppedBecause,
             ticketId: $ticketId,
+            // Worth keeping: this is how the conversation grew, one turn at a
+            // time, and it is the clearest picture of what a loop actually is.
+            conversation: $request->messages(),
         );
     }
 

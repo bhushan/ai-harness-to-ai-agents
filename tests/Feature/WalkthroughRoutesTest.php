@@ -21,6 +21,14 @@ class WalkthroughRoutesTest extends TestCase
             ->assertSee('php artisan demo:data');
     }
 
+    public function test_step_5_shows_the_transcript_and_the_conversation(): void
+    {
+        $sections = $this->get('/step-5')->assertOk()->json('sections');
+
+        $this->assertContains('2. the transcript', $sections);
+        $this->assertContains('4. the conversation it built', $sections);
+    }
+
     public function test_step_4_shows_the_sequence_running_twice(): void
     {
         $sections = $this->get('/step-4')->assertOk()->json('sections');

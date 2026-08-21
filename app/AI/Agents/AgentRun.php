@@ -6,12 +6,15 @@ final class AgentRun
 {
     /**
      * @param  array<int, AgentIteration>  $iterations
+     * @param  array<int, array<string, mixed>>  $conversation  Every turn the
+     *                                                          loop built, in order.
      */
     public function __construct(
         public readonly array $iterations,
         public readonly ?string $conclusion,
         public readonly string $stoppedBecause,
         public readonly ?int $ticketId,
+        public readonly array $conversation = [],
     ) {}
 
     /**

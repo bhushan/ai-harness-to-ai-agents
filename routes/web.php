@@ -12,6 +12,8 @@ use App\AI\Harness\SupportHarness;
 use App\AI\Tools\ToolExecutor;
 use App\AI\Tools\ToolRegistry;
 use App\Console\Commands\DemoHarnessCommand;
+use App\AI\Agents\Agent;
+use App\AI\Agents\AgentBrief;
 use App\AI\Workflows\DoubleChargeWorkflow;
 use App\Console\Commands\DemoToolsCommand;
 use App\Models\SupportTicket;
@@ -61,6 +63,12 @@ $steps = [
         'title' => 'The workflow',
         'blurb' => 'A sequence I wrote. Same four steps for every customer, including the one who needed nothing.',
         'command' => 'php artisan demo:workflow',
+    ],
+    [
+        'url' => '/step-5',
+        'title' => 'The agent',
+        'blurb' => 'A goal instead of a sequence. Expand the transcript: every decision it made is an object.',
+        'command' => 'php artisan demo:agent',
     ],
 ];
 
@@ -205,6 +213,35 @@ Route::get('/step-4', function (DoubleChargeWorkflow $workflow) {
         ),
 
         '6. and it opened him a ticket anyway' => SupportTicket::find($arjun->ticketId),
+    ]);
+});
+
+Route::get('/step-5', function (Agent $agent) {
+    DemoDatabase::reset();
+
+    $brief = new AgentBrief(
+        goal: "Handle this customer's billing issue",
+        customer: Customer::findOrFail(1),
+        scenario: 'agent-double-charge',
+    );
+
+    $run = $agent->run($brief);
+
+    return DemoDump::these([
+        // No list of steps anywhere in here.
+        '1. the brief' => $brief,
+
+        // Expand this. Iterations, each with its reasoning and its tool calls,
+        // each tool call carrying the result it got back.
+        '2. the transcript' => $run,
+
+        '3. the tools it chose, in the order it chose them' => $run->toolsCalled(),
+
+        // The loop, seen from the wire: user, assistant with a tool_use,
+        // user with a tool_result, and round again.
+        '4. the conversation it built' => $run->conversation,
+
+        '5. the ticket that came out of it' => SupportTicket::find($run->ticketId),
     ]);
 });
 

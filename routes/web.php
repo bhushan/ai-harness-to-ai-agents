@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Support\DemoDatabase;
 use App\Support\DemoDump;
 use App\AI\Harness\SupportHarness;
+use App\AI\Tools\Tool;
 use App\AI\Tools\ToolExecutor;
 use App\AI\Tools\ToolRegistry;
 use App\Console\Commands\DemoHarnessCommand;
@@ -16,7 +17,9 @@ use App\AI\Agents\Agent;
 use App\AI\Agents\AgentBrief;
 use App\AI\Workflows\DoubleChargeWorkflow;
 use App\Console\Commands\DemoToolsCommand;
+use App\Models\Approval;
 use App\Models\SupportTicket;
+use App\Models\ToolCallLog;
 use App\Console\Commands\DemoLlmCommand;
 use Illuminate\Support\Facades\Route;
 
@@ -69,6 +72,18 @@ $steps = [
         'title' => 'The agent',
         'blurb' => 'A goal instead of a sequence. Expand the transcript: every decision it made is an object.',
         'command' => 'php artisan demo:agent',
+    ],
+    [
+        'url' => '/step-6',
+        'title' => 'Boundaries',
+        'blurb' => 'The agent asks to move ₹50,000 and is stopped. Every tool now declares an impact and a permission.',
+        'command' => 'php artisan demo:agent --scenario=refund',
+    ],
+    [
+        'url' => '/step-6/after-approval',
+        'title' => 'Boundaries: the human half',
+        'blurb' => 'Run demo:approve 1 in the terminal, then open this. It does not reset, so you see what changed.',
+        'command' => 'php artisan demo:approve 1',
     ],
 ];
 
@@ -242,6 +257,55 @@ Route::get('/step-5', function (Agent $agent) {
         '4. the conversation it built' => $run->conversation,
 
         '5. the ticket that came out of it' => SupportTicket::find($run->ticketId),
+    ]);
+});
+
+Route::get('/step-6', function (Agent $agent, ToolRegistry $registry) {
+    DemoDatabase::reset();
+
+    $brief = new AgentBrief(
+        goal: 'This customer has asked for their enterprise payment to be refunded. Sort it out.',
+        customer: Customer::findOrFail(3),
+        scenario: 'agent-refund',
+    );
+
+    $run = $agent->run($brief);
+
+    return DemoDump::these([
+        // The whole boundary model, in one table.
+        '1. every tool, classified' => collect($registry->all())
+            ->map(fn (Tool $tool) => [
+                'impact' => $tool->impact()->value,
+                'permission to call' => $tool->permission(),
+                'permission to approve' => $tool->approvalPermission(),
+            ]),
+
+        '2. who the agent is acting as' => $brief->actor,
+
+        // Expand the last iteration: it asked for refund_payment and got back
+        // pending_approval. It never got the action.
+        '3. the transcript' => $run,
+
+        '4. the approval now waiting for a human' => Approval::find(1),
+
+        // Still succeeded. Still not refunded. Nothing moved.
+        '5. the payment it asked about' => Payment::find(301),
+
+        '6. the audit log' => ToolCallLog::orderBy('id')->get(),
+
+        '7. next' => 'Run php artisan demo:approve 1, then open /step-6/after-approval.',
+    ]);
+});
+
+// Deliberately does not reset, so it shows the state the approval left behind.
+Route::get('/step-6/after-approval', function () {
+    return DemoDump::these([
+        '1. the approval, and who released it' => Approval::find(1),
+
+        '2. the payment, refunded' => Payment::find(301),
+
+        // Two runs, two actors. The agent asked; a person executed.
+        '3. the audit log, both halves' => ToolCallLog::orderBy('id')->get(),
     ]);
 });
 

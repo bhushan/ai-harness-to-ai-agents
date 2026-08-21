@@ -149,7 +149,9 @@ final class DemoPrinter
         );
 
         foreach (explode("\n", (string) $encoded) as $line) {
-            $this->output->writeln(self::INDENT.$this->paint($line, 'gray'));
+            foreach ($this->foldLongLine($line) as $piece) {
+                $this->output->writeln(self::INDENT.$this->paint($piece, 'gray'));
+            }
         }
     }
 
@@ -208,6 +210,32 @@ final class DemoPrinter
         }
 
         $this->blank();
+    }
+
+    /**
+     * A long JSON string value would run off a projector. Fold it instead of
+     * truncating it, so what is on screen is still every byte that was sent.
+     *
+     * @return array<int, string>
+     */
+    private function foldLongLine(string $line): array
+    {
+        $limit = self::WIDTH - 4;
+
+        if (mb_strlen($line) <= $limit) {
+            return [$line];
+        }
+
+        $indent = str_repeat(' ', mb_strlen($line) - mb_strlen(ltrim($line)) + 4);
+        $continuation = max(20, $limit - mb_strlen($indent));
+
+        $pieces = [mb_substr($line, 0, $limit)];
+
+        foreach (mb_str_split(mb_substr($line, $limit), $continuation) as $piece) {
+            $pieces[] = $indent.$piece;
+        }
+
+        return $pieces;
     }
 
     private function paint(string $text, string $style): string

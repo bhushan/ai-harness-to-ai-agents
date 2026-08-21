@@ -8,6 +8,8 @@ use App\Models\Customer;
 use App\Models\Payment;
 use App\Support\DemoDatabase;
 use App\Support\DemoDump;
+use App\AI\Harness\SupportHarness;
+use App\Console\Commands\DemoHarnessCommand;
 use App\Console\Commands\DemoLlmCommand;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +38,12 @@ $steps = [
         'title' => 'The model on its own',
         'blurb' => 'A question and nothing else. Three fields go out, and a competent answer about nobody comes back.',
         'command' => 'php artisan demo:llm',
+    ],
+    [
+        'url' => '/step-2',
+        'title' => 'The harness',
+        'blurb' => 'Instructions plus context. The answer improves without the model changing, and then admits what it cannot see.',
+        'command' => 'php artisan demo:harness',
     ],
 ];
 
@@ -84,6 +92,33 @@ Route::get('/step-1', function (AnthropicClient $client) {
         // Search this for Priya, or 999, or 123. They are not there, and they
         // cannot be: nothing in the request said they exist.
         '4. what the answer never mentions' => ['Priya Sharma', '₹999', 'payment 123', 'ORD-2201'],
+    ]);
+});
+
+Route::get('/step-2', function (AnthropicClient $client) {
+    DemoDatabase::ensure();
+
+    $harness = new SupportHarness($client);
+    $customer = Customer::findOrFail(1);
+
+    $response = $harness->ask(DemoHarnessCommand::SCENARIO, DemoHarnessCommand::QUESTION, $customer);
+
+    return DemoDump::these([
+        '1. the instructions half of the harness' => $harness->systemPrompt(),
+
+        // Who the customer is. Deliberately not what they paid.
+        '2. the context half' => $harness->customerContext($customer),
+
+        '3. the assembled request' => $response->request(),
+
+        '4. the answer, which now knows her name' => $response->text(),
+
+        // This is sitting in SQLite the whole time. The model cannot see it,
+        // because nothing in the harness went and fetched it.
+        '5. what a tool would have had to return' => Payment::with('order')
+            ->where('customer_id', $customer->id)
+            ->orderBy('id')
+            ->get(),
     ]);
 });
 

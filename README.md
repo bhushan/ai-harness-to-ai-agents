@@ -11,6 +11,7 @@ adds exactly one idea, one command, and one section to this README.
 | --- | --- |
 | `step-0-setup` | `php artisan demo:data` |
 | `step-1-llm` | `php artisan demo:llm` |
+| `step-2-harness` | `php artisan demo:harness` |
 
 ## Setup, once
 
@@ -88,6 +89,30 @@ php artisan demo:llm
 
 Everything after this step is about closing the gap between a capable model and
 a useful answer.
+
+## Step 2: the harness
+
+**What this step demonstrates.** A harness is everything that surrounds the
+model call: which instructions go in, which context, in which order, under
+which limits. `App\AI\Harness\SupportHarness` assembles a system prompt and
+the customer record. It still has no tools.
+
+**Run it.**
+
+```bash
+php artisan demo:harness
+```
+
+**What the audience should notice.**
+
+- The answer improved without the model improving. Same model, same question.
+  Only the harness around it changed.
+- It now knows Priya by name and can restate what it was told.
+- It still cannot answer the question, and it says so. It names exactly what it
+  would need: the payment records with amounts, statuses and timestamps.
+  Context is not data access.
+- Somebody still has to fetch those records by hand before every call. That is
+  the problem step 3 solves.
 
 ## Before going on stage
 

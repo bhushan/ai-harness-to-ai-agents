@@ -1,0 +1,28 @@
+{
+    "id": "msg_01AgentDoubleCharge003",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-opus-5",
+    "content": [
+        {
+            "type": "text",
+            "text": "Two payments, 123 and 124, both ₹999, both succeeded, both against order 1001, settled three seconds apart at 10:15:02 and 10:15:05. Their idempotency keys are different, which rules out one attempt being retried by the gateway.\n\nThat is not enough on its own. If order 1001 covered two separate items, two payments could be correct. I need to see what the order was actually for."
+        },
+        {
+            "type": "tool_use",
+            "id": "toolu_01AgentGetOrdersPriya",
+            "name": "get_orders",
+            "input": {
+                "customer_id": 1
+            }
+        }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+        "input_tokens": 1502,
+        "output_tokens": 174,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0
+    }
+}

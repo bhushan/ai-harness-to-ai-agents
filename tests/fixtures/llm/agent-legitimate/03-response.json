@@ -1,0 +1,28 @@
+{
+    "id": "msg_01AgentLegitimate003",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-opus-5",
+    "content": [
+        {
+            "type": "text",
+            "text": "Two payments here as well, but they have almost nothing in common. Payment 201 is ₹999 on 2 June against order 1002. Payment 202 is ₹1,499 on 11 August against order 1003. Different orders, different amounts, seventy days apart, and two separate idempotency keys.\n\nThat is the shape of two ordinary purchases rather than one duplicated payment. Let me confirm what the two orders were for before I say so."
+        },
+        {
+            "type": "tool_use",
+            "id": "toolu_01AgentGetOrdersArjun",
+            "name": "get_orders",
+            "input": {
+                "customer_id": 2
+            }
+        }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+        "input_tokens": 1487,
+        "output_tokens": 168,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0
+    }
+}

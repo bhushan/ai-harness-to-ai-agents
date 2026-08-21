@@ -1,0 +1,31 @@
+{
+    "id": "msg_01AgentDoubleCharge004",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-opus-5",
+    "content": [
+        {
+            "type": "text",
+            "text": "One order, ORD-2201, a single annual Pro renewal for ₹999. So ₹1,998 was taken for a ₹999 order, and Priya is out of pocket by ₹999 right now.\n\nThat is a duplicate charge. I cannot refund it myself, so this needs a person, and the person should not have to repeat the check I just did."
+        },
+        {
+            "type": "tool_use",
+            "id": "toolu_01AgentCreateTicketPriya",
+            "name": "create_ticket",
+            "input": {
+                "customer_id": 1,
+                "subject": "Duplicate charge on ORD-2201: refund payment 124",
+                "body": "Order ORD-2201 is a single annual Pro renewal for ₹999.\n\nTwo payments settled against it on 19 August 2026:\n  payment 123, ₹999, succeeded, 10:15:02, idempotency key checkout_2026-08-19T10:15:01_9f21ab\n  payment 124, ₹999, succeeded, 10:15:05, idempotency key checkout_2026-08-19T10:15:04_c7d038\n\nThe keys differ, so the checkout was submitted twice rather than retried once. Total taken ₹1,998 against a ₹999 order.\n\nRequested action: refund payment 124 and leave payment 123 in place.",
+                "priority": "high"
+            }
+        }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+        "input_tokens": 1893,
+        "output_tokens": 341,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0
+    }
+}

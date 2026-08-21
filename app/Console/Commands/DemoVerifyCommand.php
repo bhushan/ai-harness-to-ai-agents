@@ -38,6 +38,11 @@ class DemoVerifyCommand extends Command
                 'arguments' => [],
                 'expect' => ['>>> REQUEST', 'Why was I charged twice?', 'authorisation hold'],
             ],
+            [
+                'command' => 'demo:harness',
+                'arguments' => [],
+                'expect' => ['SYSTEM PROMPT', 'CONTEXT', 'Priya Sharma', 'payment records'],
+            ],
         ];
     }
 

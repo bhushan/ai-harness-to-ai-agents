@@ -3,6 +3,8 @@
 namespace App\Support;
 
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Determinism helper.
@@ -13,6 +15,26 @@ use Illuminate\Support\Facades\Artisan;
  */
 final class DemoDatabase
 {
+    /**
+     * For read-only commands. Seeds only if there is nothing there yet, so the
+     * repository works immediately after a clone and a command never wipes data
+     * it did not need to wipe.
+     */
+    public static function ensure(): void
+    {
+        self::ensureSqliteFileExists();
+
+        if (Schema::hasTable('customers') && DB::table('customers')->exists()) {
+            return;
+        }
+
+        self::reset();
+    }
+
+    /**
+     * For commands that write. Resets to the seeded state first so the same
+     * command produces the same ticket ids on the tenth run as on the first.
+     */
     public static function reset(): void
     {
         self::ensureSqliteFileExists();

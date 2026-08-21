@@ -10,6 +10,7 @@ adds exactly one idea, one command, and one section to this README.
 | Branch | Command |
 | --- | --- |
 | `step-0-setup` | `php artisan demo:data` |
+| `step-1-llm` | `php artisan demo:llm` |
 
 ## Setup, once
 
@@ -47,6 +48,31 @@ php artisan demo:data
   `App\Billing\FixtureStripeGateway` reads real-shaped Stripe objects from
   `tests/fixtures/stripe/`. A missing fixture stops the run with a message
   naming the scenario, the call index, and the file it expected.
+
+## Step 1: the model on its own
+
+**What this step demonstrates.** A model with a question and nothing else.
+
+**Run it.**
+
+```bash
+php artisan demo:llm
+```
+
+**What the audience should notice.**
+
+- The outgoing request is three fields: a model id, a token ceiling, and one
+  message. That is the entire input.
+- The answer is not wrong. It is a competent support article about
+  authorisation holds and retried payments. It also never mentions Priya
+  Sharma, ₹999, or payments 123 and 124, because nothing in the request said
+  they exist.
+- The payload printed on screen is the real Anthropic Messages API shape, and
+  the copy written to `storage/demo/requests/llm-raw/01-request.json` is the
+  same bytes. Open it if somebody asks.
+
+Everything after this step is about closing the gap between a capable model and
+a useful answer.
 
 ## Before going on stage
 

@@ -1,0 +1,20 @@
+{
+    "id": "msg_01RawQuestionNoContext01",
+    "type": "message",
+    "role": "assistant",
+    "model": "claude-opus-5",
+    "content": [
+        {
+            "type": "text",
+            "text": "I'm sorry about the confusion, and I'd be glad to help you work out what happened. Without access to your account I can only describe the usual causes.\n\nThe most common one is an authorisation hold sitting alongside the settled payment. Some banks show the hold as a separate line for a few days before it drops off on its own, usually within five to seven working days. A second possibility is a payment that was submitted more than once, for example if a checkout page was refreshed or a card was declined and then retried. A third is a subscription renewal landing close to a separate one-off purchase, which can look like the same amount twice.\n\nTo tell these apart, compare the two entries on your statement. If one is still marked as pending, it is very likely a hold. If both have settled, it is worth asking the merchant to check their records against the transaction references shown on your statement, since they can see the individual payment attempts and issue a refund if one of them was not intended."
+        }
+    ],
+    "stop_reason": "end_turn",
+    "stop_sequence": null,
+    "usage": {
+        "input_tokens": 17,
+        "output_tokens": 214,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0
+    }
+}

@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\AI\Transport\FixtureTransport;
+use App\AI\Transport\LlmTransport;
 use App\Support\DemoPrinter;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
@@ -57,6 +59,21 @@ class DemoVerifyCommand extends Command
                 'command' => 'demo:workflow',
                 'arguments' => ['--customer' => 2],
                 'expect' => ['Arjun', 'neither of them is a duplicate', 'ticket #1'],
+            ],
+            [
+                'command' => 'demo:agent',
+                'arguments' => [],
+                'expect' => ['ITERATION 1', 'ITERATION 5', 'REASONING', 'TOOL CALL', 'RESULT', 'ticket #1', 'payment 124'],
+            ],
+            [
+                'command' => 'demo:agent',
+                'arguments' => ['--scenario' => 'legitimate'],
+                'expect' => ['ITERATION 4', 'no refund is owed', 'NO TICKET OPENED'],
+            ],
+            [
+                'command' => 'demo:agent',
+                'arguments' => ['--max-iterations' => 2],
+                'expect' => ['the iteration cap of 2 was reached'],
             ],
         ];
     }
@@ -116,6 +133,15 @@ class DemoVerifyCommand extends Command
      */
     private function runCheck(array $check): ?string
     {
+        // Each command would normally run in its own process, with its fixture
+        // counter starting at zero. Verify runs them back to back, so give each
+        // one the same clean start it would get from the shell.
+        $transport = app(LlmTransport::class);
+
+        if ($transport instanceof FixtureTransport) {
+            $transport->rewind();
+        }
+
         // The buffer is passed in explicitly. Some demo commands reset the
         // database with a nested Artisan call, which would otherwise replace the
         // buffer we are trying to read.

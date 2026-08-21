@@ -14,6 +14,7 @@ adds exactly one idea, one command, and one section to this README.
 | `step-2-harness` | `php artisan demo:harness` |
 | `step-3-tools` | `php artisan demo:tools` |
 | `step-4-workflow` | `php artisan demo:workflow` |
+| `step-5-agent` | `php artisan demo:agent` |
 
 ## Setup, once
 
@@ -158,6 +159,36 @@ php artisan demo:workflow --customer=2
   this anyway."*
 - A workflow cannot notice that it did not need to run. That is the ceiling
   step 5 goes past.
+
+## Step 5: the agent
+
+**What this step demonstrates.** The loop. Reason, choose a tool, execute it,
+observe the result, repeat, until the model stops asking for tools or the cap
+is reached. The difference from step 4 is one thing only: the order of the tool
+calls is decided one turn at a time by the model, instead of once in advance by
+me.
+
+**Run it.**
+
+```bash
+php artisan demo:agent --goal="Handle this customer's billing issue"
+php artisan demo:agent --scenario=legitimate
+php artisan demo:agent --max-iterations=2
+```
+
+**What the audience should notice.**
+
+- Nobody wrote the order of those tool calls. Each one was chosen after reading
+  the result of the last.
+- The agent did not stop at two payments and shout duplicate. It checked what
+  the order was actually for before deciding, and said so in its reasoning.
+- Then run `--scenario=legitimate`. Same code, same tools, same goal, a
+  different customer: three lookups, no ticket, and an explicit "no refund is
+  owed". **Two paths out of the same tools is the whole point of the step.**
+- The cap is hard. `--max-iterations=2` stops the run mid investigation and
+  says so.
+- Every decision is in the transcript: iterations, tools called in order, and
+  why the loop stopped. An agent that cannot be replayed cannot be trusted.
 
 ## Before going on stage
 

@@ -48,6 +48,19 @@ final class FixtureTransport implements LlmTransport
         return $this->calls[$scenario] ?? 0;
     }
 
+    /**
+     * Forget which fixtures have been served.
+     *
+     * Each command normally runs in its own process, where the count starts at
+     * zero anyway. This exists for demo:verify, which runs several commands in
+     * one process and needs each of them to behave as if it had just started.
+     */
+    public function rewind(): void
+    {
+        $this->calls = [];
+        $this->recordingsCleared = [];
+    }
+
     public function fixturePathFor(string $scenario, int $call): string
     {
         return $this->fixturePath.'/'.$scenario.'/'.self::index($call).'-response.json';

@@ -21,6 +21,14 @@ class WalkthroughRoutesTest extends TestCase
             ->assertSee('php artisan demo:data');
     }
 
+    public function test_step_1_shows_the_request_and_the_answer(): void
+    {
+        $sections = $this->get('/step-1')->assertOk()->json('sections');
+
+        $this->assertContains('1. the request, exactly as it goes to /v1/messages', $sections);
+        $this->assertContains('3. the answer on its own', $sections);
+    }
+
     public function test_step_0_shows_the_scenario_and_the_fake_transports(): void
     {
         $sections = $this->get('/step-0')->assertOk()->json('sections');

@@ -1,0 +1,64 @@
+{
+    "id": "ch_3ArjunMehtaBB0002",
+    "object": "charge",
+    "amount": 149900,
+    "amount_captured": 149900,
+    "amount_refunded": 0,
+    "balance_transaction": "txn_45697532d66f3141a90faaaf",
+    "billing_details": {
+        "address": {
+            "city": "Pune",
+            "country": "IN",
+            "line1": null,
+            "line2": null,
+            "postal_code": null,
+            "state": null
+        },
+        "email": "arjun.mehta@example.in",
+        "name": "Arjun Mehta",
+        "phone": "+91 99300 55440"
+    },
+    "captured": true,
+    "created": 1786465330,
+    "currency": "inr",
+    "customer": "cus_ArjunMehta01",
+    "description": "ORD-2340 Extra seats, 5 users",
+    "disputed": false,
+    "livemode": false,
+    "metadata": {
+        "order_reference": "ORD-2340",
+        "idempotency_key": "checkout_2026-08-11T16:22:09_e5c744"
+    },
+    "outcome": {
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 9,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+    },
+    "paid": true,
+    "payment_intent": "pi_3ArjunMehtaBB0002",
+    "payment_method": "pm_ArjunMehtaBB0002",
+    "payment_method_details": {
+        "card": {
+            "brand": "mastercard",
+            "country": "IN",
+            "exp_month": 11,
+            "exp_year": 2029,
+            "funding": "credit",
+            "last4": "1881",
+            "network": "mastercard",
+            "three_d_secure": {
+                "authentication_flow": "challenge",
+                "result": "authenticated",
+                "version": "2.2.0"
+            },
+            "wallet": null
+        },
+        "type": "card"
+    },
+    "receipt_url": "https://pay.stripe.com/receipts/ch_3ArjunMehtaBB0002/rcpt_2665cd61cab010d011bc",
+    "refunded": false,
+    "status": "succeeded"
+}

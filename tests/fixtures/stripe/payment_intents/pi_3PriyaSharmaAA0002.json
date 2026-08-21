@@ -1,0 +1,27 @@
+{
+    "id": "pi_3PriyaSharmaAA0002",
+    "object": "payment_intent",
+    "amount": 99900,
+    "amount_capturable": 0,
+    "amount_received": 99900,
+    "capture_method": "automatic",
+    "client_secret": "pi_3PriyaSharmaAA0002_secret_ZmFrZV9mb3JfYV9tZWV0dXA",
+    "confirmation_method": "automatic",
+    "created": 1787134505,
+    "currency": "inr",
+    "customer": "cus_PriyaSharma01",
+    "description": "ORD-2201 Pro plan, annual",
+    "latest_charge": "ch_3PriyaSharmaAA0002",
+    "livemode": false,
+    "metadata": {
+        "order_reference": "ORD-2201",
+        "idempotency_key": "checkout_2026-08-19T10:15:04_c7d038",
+        "client_ip": "49.36.221.7",
+        "submitted_from": "web-checkout"
+    },
+    "payment_method": "pm_PriyaSharmaAA000",
+    "payment_method_types": [
+        "card"
+    ],
+    "status": "succeeded"
+}

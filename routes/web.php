@@ -9,7 +9,10 @@ use App\Models\Payment;
 use App\Support\DemoDatabase;
 use App\Support\DemoDump;
 use App\AI\Harness\SupportHarness;
+use App\AI\Tools\ToolExecutor;
+use App\AI\Tools\ToolRegistry;
 use App\Console\Commands\DemoHarnessCommand;
+use App\Console\Commands\DemoToolsCommand;
 use App\Console\Commands\DemoLlmCommand;
 use Illuminate\Support\Facades\Route;
 
@@ -44,6 +47,12 @@ $steps = [
         'title' => 'The harness',
         'blurb' => 'Instructions plus context. The answer improves without the model changing, and then admits what it cannot see.',
         'command' => 'php artisan demo:harness',
+    ],
+    [
+        'url' => '/step-3',
+        'title' => 'Tools',
+        'blurb' => 'The model asks instead of answering. My code validates the arguments and runs real Eloquent.',
+        'command' => 'php artisan demo:tools',
     ],
 ];
 
@@ -119,6 +128,48 @@ Route::get('/step-2', function (AnthropicClient $client) {
             ->where('customer_id', $customer->id)
             ->orderBy('id')
             ->get(),
+    ]);
+});
+
+Route::get('/step-3', function (AnthropicClient $client, ToolRegistry $registry, ToolExecutor $executor) {
+    DemoDatabase::ensure();
+
+    $harness = new SupportHarness($client);
+    $customer = Customer::findOrFail(1);
+
+    $request = $harness->buildRequest(DemoToolsCommand::QUESTION, $customer, $registry->schemas());
+    $first = $client->send(DemoToolsCommand::SCENARIO, $request);
+
+    $call = $first->toolUses()[0];
+    $result = $executor->run($call['name'], $call['input']);
+
+    $toolResult = [
+        'type' => 'tool_result',
+        'tool_use_id' => $call['id'],
+        'content' => $result->toContent(),
+    ];
+
+    $second = $client->send(DemoToolsCommand::SCENARIO, $request
+        ->withMessage('assistant', $first->contentBlocks())
+        ->withMessage('user', [$toolResult]));
+
+    return DemoDump::these([
+        // Four ordinary Laravel classes, rendered as the API wants them.
+        '1. the tools we offer' => $registry->schemas(),
+
+        '2. the request, now carrying those tools' => $first->request(),
+
+        // stop_reason is tool_use. It did not answer, it asked.
+        '3. what came back' => $first->raw(),
+
+        '4. the tool the model chose, and its arguments' => $call,
+
+        // Not mocked. Eloquent against SQLite, plus a gateway lookup.
+        '5. what our code actually ran and got' => $result->toArray(),
+
+        '6. the tool_result we hand back' => $toolResult,
+
+        '7. the final answer, every number of it from step 5' => $second->text(),
     ]);
 });
 

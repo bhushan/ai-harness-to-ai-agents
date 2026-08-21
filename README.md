@@ -23,6 +23,21 @@ php artisan demo:data
 
 No API key is required. An absent `ANTHROPIC_API_KEY` is the normal state here.
 
+## Two ways to watch it
+
+Every step has a command and a route, and they show different things.
+
+```bash
+php artisan demo:data       # the story, in sequence, in the terminal
+php artisan serve           # then open http://localhost:8000
+```
+
+The commands are the narrative: step counters, iterations, the loop unfolding.
+The routes are the hood: each one `dd()`s the payloads, the objects and the
+database rows behind that step, so a request body can be expanded and collapsed
+at the speed of the room. `routes/web.php` grows by one route per branch, so on
+any branch it reads as a table of contents for the talk so far.
+
 ## Step 0: setup
 
 **What this step demonstrates.** The plumbing that makes an offline demo

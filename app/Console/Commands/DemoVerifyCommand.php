@@ -33,6 +33,11 @@ class DemoVerifyCommand extends Command
                 'arguments' => [],
                 'expect' => ['Priya Sharma', 'ORD-2201', '₹999', 'Arjun Mehta'],
             ],
+            [
+                'command' => 'demo:llm',
+                'arguments' => [],
+                'expect' => ['>>> REQUEST', 'Why was I charged twice?', 'authorisation hold'],
+            ],
         ];
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\AI\AnthropicClient;
 use App\AI\Transport\FixtureTransport;
 use App\AI\Transport\LlmTransport;
 use App\Billing\FixtureStripeGateway;
@@ -21,6 +22,12 @@ class DemoServiceProvider extends ServiceProvider
         $this->app->singleton(LlmTransport::class, fn () => new FixtureTransport(
             fixturePath: config('demo.fixtures.llm'),
             recordPath: config('demo.record_requests_to'),
+        ));
+
+        $this->app->singleton(AnthropicClient::class, fn ($app) => new AnthropicClient(
+            transport: $app->make(LlmTransport::class),
+            model: config('demo.model'),
+            maxTokens: (int) config('demo.max_tokens'),
         ));
 
         $this->app->singleton(StripeGateway::class, fn () => new FixtureStripeGateway(

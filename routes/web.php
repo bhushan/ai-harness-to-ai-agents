@@ -1,11 +1,14 @@
 <?php
 
+use App\AI\AnthropicClient;
+use App\AI\MessagesRequest;
 use App\AI\Transport\LlmTransport;
 use App\Billing\StripeGateway;
 use App\Models\Customer;
 use App\Models\Payment;
 use App\Support\DemoDatabase;
 use App\Support\DemoDump;
+use App\Console\Commands\DemoLlmCommand;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,6 +30,12 @@ $steps = [
         'title' => 'Setup',
         'blurb' => 'The scenario in SQLite, and the two fixture backed transports that replace the network.',
         'command' => 'php artisan demo:data',
+    ],
+    [
+        'url' => '/step-1',
+        'title' => 'The model on its own',
+        'blurb' => 'A question and nothing else. Three fields go out, and a competent answer about nobody comes back.',
+        'command' => 'php artisan demo:llm',
     ],
 ];
 
@@ -54,6 +63,27 @@ Route::get('/step-0', function (LlmTransport $transport, StripeGateway $gateway)
 
         // A real Stripe charge object, shape for shape, from a committed file.
         '5. the gateway record behind payment 124' => $gateway->retrieveCharge('ch_3PriyaSharmaAA0002'),
+    ]);
+});
+
+Route::get('/step-1', function (AnthropicClient $client) {
+    $response = $client->send(
+        DemoLlmCommand::SCENARIO,
+        MessagesRequest::make()->withUserMessage(DemoLlmCommand::QUESTION)
+    );
+
+    return DemoDump::these([
+        // Three keys. This is the entire input the model gets.
+        '1. the request, exactly as it goes to /v1/messages' => $response->request(),
+
+        // A real Messages API response: content blocks, stop_reason, usage.
+        '2. the raw response' => $response->raw(),
+
+        '3. the answer on its own' => $response->text(),
+
+        // Search this for Priya, or 999, or 123. They are not there, and they
+        // cannot be: nothing in the request said they exist.
+        '4. what the answer never mentions' => ['Priya Sharma', '₹999', 'payment 123', 'ORD-2201'],
     ]);
 });
 

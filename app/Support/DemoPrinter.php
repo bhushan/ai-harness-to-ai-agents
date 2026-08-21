@@ -156,7 +156,8 @@ final class DemoPrinter
     public function paragraph(string $text, string $colour = 'default'): void
     {
         foreach (explode("\n", wordwrap(trim($text), self::WIDTH - 4)) as $line) {
-            $this->output->writeln(self::INDENT.$this->paint($line, $colour));
+            // Blank lines stay genuinely blank rather than two stray spaces.
+            $this->output->writeln($line === '' ? '' : self::INDENT.$this->paint($line, $colour));
         }
     }
 

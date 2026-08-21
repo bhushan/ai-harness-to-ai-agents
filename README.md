@@ -13,6 +13,7 @@ adds exactly one idea, one command, and one section to this README.
 | `step-1-llm` | `php artisan demo:llm` |
 | `step-2-harness` | `php artisan demo:harness` |
 | `step-3-tools` | `php artisan demo:tools` |
+| `step-4-workflow` | `php artisan demo:workflow` |
 
 ## Setup, once
 
@@ -144,6 +145,34 @@ php artisan demo:tools
   actually enforce. Never let the first do the job of the second.
 - The sequence was still mine: one call, one execution, one answer. Deciding
   that sequence is step 4.
+
+## Step 4: the workflow
+
+**What this step demonstrates.** The same four tools, driven by a sequence I
+wrote. `DoubleChargeWorkflow::SEQUENCE` is a constant: check the customer,
+check the payments, check the orders, open a ticket. The model is used once, at
+the end, to write the reply.
+
+**Run it.**
+
+```bash
+php artisan demo:workflow
+php artisan demo:workflow --customer=2
+```
+
+**What the audience should notice.**
+
+- Four steps, one model call, and the model call is last. It writes the reply.
+  It does not decide what to look up, in what order, or whether a ticket is
+  warranted.
+- The sequence is a constant in my code. The model never sees it and cannot add
+  to it, skip an entry, or reorder it. Predictable, auditable, cheap.
+- Then run it against Arjun, whose two payments are two ordinary purchases. It
+  still opens a high priority ticket, because I told it to. The summary even
+  says so: *"A high priority ticket has been opened for a colleague to review
+  this anyway."*
+- A workflow cannot notice that it did not need to run. That is the ceiling
+  step 5 goes past.
 
 ## Before going on stage
 

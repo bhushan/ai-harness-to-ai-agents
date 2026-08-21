@@ -12,7 +12,9 @@ use App\AI\Harness\SupportHarness;
 use App\AI\Tools\ToolExecutor;
 use App\AI\Tools\ToolRegistry;
 use App\Console\Commands\DemoHarnessCommand;
+use App\AI\Workflows\DoubleChargeWorkflow;
 use App\Console\Commands\DemoToolsCommand;
+use App\Models\SupportTicket;
 use App\Console\Commands\DemoLlmCommand;
 use Illuminate\Support\Facades\Route;
 
@@ -53,6 +55,12 @@ $steps = [
         'title' => 'Tools',
         'blurb' => 'The model asks instead of answering. My code validates the arguments and runs real Eloquent.',
         'command' => 'php artisan demo:tools',
+    ],
+    [
+        'url' => '/step-4',
+        'title' => 'The workflow',
+        'blurb' => 'A sequence I wrote. Same four steps for every customer, including the one who needed nothing.',
+        'command' => 'php artisan demo:workflow',
     ],
 ];
 
@@ -170,6 +178,33 @@ Route::get('/step-3', function (AnthropicClient $client, ToolRegistry $registry,
         '6. the tool_result we hand back' => $toolResult,
 
         '7. the final answer, every number of it from step 5' => $second->text(),
+    ]);
+});
+
+Route::get('/step-4', function (DoubleChargeWorkflow $workflow) {
+    // This route writes tickets, so it starts from the seeded state.
+    DemoDatabase::reset();
+
+    $priya = $workflow->run(customerId: 1, scenario: 'workflow');
+    $arjun = $workflow->run(customerId: 2, scenario: 'workflow-legitimate');
+
+    return DemoDump::these([
+        // A constant. The model never sees it and cannot reorder it.
+        '1. the sequence' => DoubleChargeWorkflow::SEQUENCE,
+
+        '2. every step that ran, in order' => $priya->steps,
+
+        '3. the ticket it opened' => SupportTicket::find($priya->ticketId),
+
+        '4. the reply, written by the one model call at the end' => $priya->summary?->text(),
+
+        // Same four tools, same order, for a customer with nothing wrong.
+        '5. pointed at Arjun, who needed nothing' => array_map(
+            fn ($step) => $step->tool,
+            $arjun->steps
+        ),
+
+        '6. and it opened him a ticket anyway' => SupportTicket::find($arjun->ticketId),
     ]);
 });
 

@@ -48,6 +48,16 @@ class DemoVerifyCommand extends Command
                 'arguments' => [],
                 'expect' => ['"tools"', 'tool_use', 'get_payments', 'tool_result', 'payment 123', 'payment 124'],
             ],
+            [
+                'command' => 'demo:workflow',
+                'arguments' => [],
+                'expect' => ['STEP 1 OF 4', 'STEP 4 OF 4', 'payment 123', 'ticket #1'],
+            ],
+            [
+                'command' => 'demo:workflow',
+                'arguments' => ['--customer' => 2],
+                'expect' => ['Arjun', 'neither of them is a duplicate', 'ticket #1'],
+            ],
         ];
     }
 

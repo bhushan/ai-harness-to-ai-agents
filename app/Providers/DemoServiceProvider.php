@@ -4,6 +4,11 @@ namespace App\Providers;
 
 use App\AI\AnthropicClient;
 use App\AI\Transport\FixtureTransport;
+use App\AI\Tools\CreateTicket;
+use App\AI\Tools\GetCustomer;
+use App\AI\Tools\GetOrders;
+use App\AI\Tools\GetPayments;
+use App\AI\Tools\ToolRegistry;
 use App\AI\Transport\LlmTransport;
 use App\Billing\FixtureStripeGateway;
 use App\Billing\StripeGateway;
@@ -29,6 +34,14 @@ class DemoServiceProvider extends ServiceProvider
             model: config('demo.model'),
             maxTokens: (int) config('demo.max_tokens'),
         ));
+
+        // Registration order is the order the model sees them in, and it stays
+        // stable so the request payload is identical on every run.
+        $this->app->singleton(ToolRegistry::class, fn ($app) => (new ToolRegistry)
+            ->register($app->make(GetCustomer::class))
+            ->register($app->make(GetOrders::class))
+            ->register($app->make(GetPayments::class))
+            ->register($app->make(CreateTicket::class)));
 
         $this->app->singleton(StripeGateway::class, fn () => new FixtureStripeGateway(
             fixturePath: config('demo.fixtures.stripe'),

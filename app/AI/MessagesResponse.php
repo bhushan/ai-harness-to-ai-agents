@@ -47,6 +47,32 @@ final class MessagesResponse
         return trim(implode("\n\n", $parts));
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function contentBlocks(): array
+    {
+        return $this->raw['content'] ?? [];
+    }
+
+    /**
+     * The blocks where the model asked this application to do something.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function toolUses(): array
+    {
+        return array_values(array_filter(
+            $this->contentBlocks(),
+            fn (array $block) => ($block['type'] ?? null) === 'tool_use'
+        ));
+    }
+
+    public function wantsToolUse(): bool
+    {
+        return $this->stopReason() === 'tool_use';
+    }
+
     public function stopReason(): string
     {
         return $this->raw['stop_reason'] ?? 'unknown';

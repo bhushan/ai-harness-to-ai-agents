@@ -19,17 +19,29 @@ final class SupportHarness
 {
     public function __construct(private readonly ?AnthropicClient $client = null) {}
 
-    public function systemPrompt(): string
+    public function systemPrompt(bool $hasTools = false): string
     {
-        return <<<'PROMPT'
+        $instructions = <<<'PROMPT'
         You are a billing support assistant for a subscription product used by customers in India.
 
         Answer the customer directly, in plain language, and address them by name. Amounts are in Indian rupees.
 
-        Never invent an amount, a date, a payment id or an order reference. If the information you need to answer is not in the context you were given, say so plainly, say exactly what you would need to see, and stop there.
+        Never invent an amount, a date, a payment id or an order reference.
 
         Do not promise a refund. A human decides refunds.
         PROMPT;
+
+        // The only difference between a harness with tools and one without is
+        // what you tell the model to do when it does not know something.
+        $closing = $hasTools
+            ? <<<'PROMPT'
+            You have tools that read this application's database. Look things up rather than asking the customer to fetch them for you. Every amount, date and id in your answer must have come back from a tool.
+            PROMPT
+            : <<<'PROMPT'
+            If the information you need to answer is not in the context you were given, say so plainly, say exactly what you would need to see, and stop there.
+            PROMPT;
+
+        return $instructions."\n\n".$closing;
     }
 
     /**
@@ -52,14 +64,19 @@ final class SupportHarness
         CONTEXT;
     }
 
-    public function buildRequest(string $question, Customer $customer): MessagesRequest
+    /**
+     * @param  array<int, array<string, mixed>>  $tools
+     */
+    public function buildRequest(string $question, Customer $customer, array $tools = []): MessagesRequest
     {
-        return MessagesRequest::make()
-            ->withSystem($this->systemPrompt())
+        $request = MessagesRequest::make()
+            ->withSystem($this->systemPrompt(hasTools: $tools !== []))
             ->withMessage('user', [
                 ['type' => 'text', 'text' => $this->customerContext($customer)],
                 ['type' => 'text', 'text' => $question],
             ]);
+
+        return $tools === [] ? $request : $request->withTools($tools);
     }
 
     public function ask(string $scenario, string $question, Customer $customer): MessagesResponse

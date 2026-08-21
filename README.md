@@ -12,6 +12,7 @@ adds exactly one idea, one command, and one section to this README.
 | `step-0-setup` | `php artisan demo:data` |
 | `step-1-llm` | `php artisan demo:llm` |
 | `step-2-harness` | `php artisan demo:harness` |
+| `step-3-tools` | `php artisan demo:tools` |
 
 ## Setup, once
 
@@ -98,6 +99,36 @@ php artisan demo:harness
   Context is not data access.
 - Somebody still has to fetch those records by hand before every call. That is
   the problem step 3 solves.
+
+## Step 3: tools
+
+**What this step demonstrates.** A tool is an ordinary Laravel service with a
+name, a description written for the model, a JSON schema for its input,
+validation rules for the same input, and a typed `execute()`. There are four in
+`app/AI/Tools/`: `get_customer`, `get_orders`, `get_payments` and
+`create_ticket`.
+
+**Run it.**
+
+```bash
+php artisan demo:tools
+```
+
+**What the audience should notice.**
+
+- The model did not answer. It asked. `stop_reason` came back as `tool_use`,
+  carrying the tool name and the arguments it wanted.
+- My code decided whether to run it. `ToolExecutor` validates the arguments the
+  model produced before anything touches the database, because the model is an
+  untrusted caller.
+- The execution is genuinely real: ordinary Eloquent against SQLite, plus a
+  gateway lookup. Only the two model responses come from fixtures.
+- The final answer names payments 123 and 124, ₹999, ORD-2201 and both
+  idempotency keys. Every one of those came back from the tool result.
+- The schema is what we tell the model; the validation rules are what we
+  actually enforce. Never let the first do the job of the second.
+- The sequence was still mine: one call, one execution, one answer. Deciding
+  that sequence is step 4.
 
 ## Before going on stage
 

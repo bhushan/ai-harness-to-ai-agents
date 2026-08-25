@@ -12,6 +12,21 @@ final class GetCustomer implements Tool
         return 'get_customer';
     }
 
+    public function impact(): ToolImpact
+    {
+        return ToolImpact::Read;
+    }
+
+    public function permission(): string
+    {
+        return 'customers.read';
+    }
+
+    public function approvalPermission(): ?string
+    {
+        return null;
+    }
+
     public function description(): string
     {
         return 'Look up one customer by id. Returns their name, email, phone, plan and the date '

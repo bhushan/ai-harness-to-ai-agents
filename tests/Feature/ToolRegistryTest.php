@@ -8,12 +8,12 @@ use Tests\TestCase;
 
 class ToolRegistryTest extends TestCase
 {
-    public function test_it_exposes_the_four_tools_in_the_shape_the_api_expects(): void
+    public function test_it_exposes_every_tool_in_the_shape_the_api_expects(): void
     {
         $schemas = app(ToolRegistry::class)->schemas();
 
         $this->assertSame(
-            ['get_customer', 'get_orders', 'get_payments', 'create_ticket'],
+            ['get_customer', 'get_orders', 'get_payments', 'create_ticket', 'refund_payment'],
             array_column($schemas, 'name')
         );
 

@@ -13,6 +13,21 @@ final class CreateTicket implements Tool
         return 'create_ticket';
     }
 
+    public function impact(): ToolImpact
+    {
+        return ToolImpact::Write;
+    }
+
+    public function permission(): string
+    {
+        return 'tickets.create';
+    }
+
+    public function approvalPermission(): ?string
+    {
+        return null;
+    }
+
     public function description(): string
     {
         return 'Open a support ticket for a human to act on. Use this when something needs a person: '

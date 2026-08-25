@@ -56,7 +56,7 @@ class AgentTest extends TestCase
         $double = app(Agent::class)->run($this->brief(1, 'agent-double-charge'));
 
         $this->assertSame(
-            ['get_customer', 'get_orders', 'get_payments', 'create_ticket'],
+            ['get_customer', 'get_orders', 'get_payments', 'create_ticket', 'refund_payment'],
             array_column($double->iterations[0]->toolsOffered, 'name')
         );
     }

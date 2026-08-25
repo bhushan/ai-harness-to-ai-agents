@@ -15,6 +15,7 @@ adds exactly one idea, one command, and one section to this README.
 | `step-3-tools` | `php artisan demo:tools` |
 | `step-4-workflow` | `php artisan demo:workflow` |
 | `step-5-agent` | `php artisan demo:agent` |
+| `step-6-boundaries` | `php artisan demo:agent --scenario=refund`, `demo:approve`, `demo:audit` |
 
 ## Setup, once
 
@@ -204,6 +205,42 @@ php artisan demo:agent --max-iterations=2
   says so.
 - Every decision is in the transcript: iterations, tools called in order, and
   why the loop stopped. An agent that cannot be replayed cannot be trusted.
+
+## Step 6: boundaries
+
+**What this step demonstrates.** Capability is not the hard part. Deciding what
+an agent may do on its own is. Every tool now declares an impact and a required
+permission, and a fifth tool, `refund_payment`, is high impact.
+
+**Run it, in this order.**
+
+```bash
+php artisan demo:agent --scenario=refund
+php artisan demo:approve 1
+php artisan demo:audit
+```
+
+**What the audience should notice.**
+
+- The agent asks for a ₹50,000 refund and is stopped. It gets a real answer
+  back, `status: pending_approval` with an approval id, so the loop keeps
+  working and it can explain itself. What it does not get is the action.
+- Its own reply says so: *"nothing has moved yet"*. The payment row is
+  untouched, and a test asserts it.
+- `demo:approve 1` runs **the same tool class**, from a person typing a
+  command, as `billing-lead`, the only actor holding
+  `payments.refund.execute`. The boundary lives in the harness, not in the tool
+  and not in the prompt.
+- `demo:audit` shows both halves: run 1 by `assistant` ending in
+  `pending_approval`, run 2 by `billing-lead` ending in `executed`. Those rows
+  are written by the executor on every call, whatever the outcome, and none of
+  them came from the model.
+
+**The four checks, in order, in `ToolExecutor`:** is the tool registered, is
+this actor allowed to call it, is the input valid, and is this something an
+agent may do or only request.
+
+See [DEMO.md](DEMO.md) for the full run order of the talk.
 
 ## Before going on stage
 

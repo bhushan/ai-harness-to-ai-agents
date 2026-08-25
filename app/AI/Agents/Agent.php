@@ -5,6 +5,7 @@ namespace App\AI\Agents;
 use App\AI\AnthropicClient;
 use App\AI\MessagesRequest;
 use App\AI\Tools\ToolExecutor;
+use App\AI\Tools\ToolImpact;
 use App\AI\Tools\ToolRegistry;
 use Closure;
 
@@ -38,7 +39,9 @@ final class Agent
 
         Two payments are not automatically a mistake. Check whether they belong to the same order and were taken seconds apart, or whether they are separate purchases made at different times for different things.
 
-        You cannot issue refunds. Open a ticket only when a human genuinely has to act, and say plainly what you want them to do. If nothing needs a human, do not open a ticket.
+        Some tools are marked high impact. Calling one records a request for a human to approve; it does not carry the action out. If you request one, say plainly in your reply that it is pending approval rather than done.
+
+        Open a ticket only when a human genuinely has to act, and say plainly what you want them to do. If nothing needs a human, do not open a ticket.
 
         When you have the answer, stop calling tools and write the reply.
         PROMPT;
@@ -68,11 +71,14 @@ final class Agent
             $resultBlocks = [];
 
             foreach ($response->toolUses() as $use) {
-                $result = $this->executor->run($use['name'], $use['input']);
+                $result = $this->executor->run($use['name'], $use['input'], $brief->actor);
 
                 $calls[] = new AgentToolCall(
                     id: $use['id'],
                     tool: $use['name'],
+                    impact: $this->registry->has($use['name'])
+                        ? $this->registry->get($use['name'])->impact()
+                        : ToolImpact::Read,
                     input: $use['input'],
                     result: $result,
                 );

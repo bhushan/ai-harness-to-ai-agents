@@ -13,6 +13,21 @@ final class GetOrders implements Tool
         return 'get_orders';
     }
 
+    public function impact(): ToolImpact
+    {
+        return ToolImpact::Read;
+    }
+
+    public function permission(): string
+    {
+        return 'orders.read';
+    }
+
+    public function approvalPermission(): ?string
+    {
+        return null;
+    }
+
     public function description(): string
     {
         return 'List every order placed by one customer, newest first. Returns the order reference, '

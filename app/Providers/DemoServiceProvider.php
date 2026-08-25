@@ -3,11 +3,13 @@
 namespace App\Providers;
 
 use App\AI\AnthropicClient;
+use App\AI\Audit\AuditLog;
 use App\AI\Transport\FixtureTransport;
 use App\AI\Tools\CreateTicket;
 use App\AI\Tools\GetCustomer;
 use App\AI\Tools\GetOrders;
 use App\AI\Tools\GetPayments;
+use App\AI\Tools\RefundPayment;
 use App\AI\Tools\ToolRegistry;
 use App\AI\Transport\LlmTransport;
 use App\Billing\FixtureStripeGateway;
@@ -35,13 +37,18 @@ class DemoServiceProvider extends ServiceProvider
             maxTokens: (int) config('demo.max_tokens'),
         ));
 
+        // One audit log per process, so every tool call in a command lands in
+        // the same run and carries the same context.
+        $this->app->singleton(AuditLog::class);
+
         // Registration order is the order the model sees them in, and it stays
         // stable so the request payload is identical on every run.
         $this->app->singleton(ToolRegistry::class, fn ($app) => (new ToolRegistry)
             ->register($app->make(GetCustomer::class))
             ->register($app->make(GetOrders::class))
             ->register($app->make(GetPayments::class))
-            ->register($app->make(CreateTicket::class)));
+            ->register($app->make(CreateTicket::class))
+            ->register($app->make(RefundPayment::class)));
 
         $this->app->singleton(StripeGateway::class, fn () => new FixtureStripeGateway(
             fixturePath: config('demo.fixtures.stripe'),

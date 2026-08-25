@@ -21,6 +21,28 @@ class WalkthroughRoutesTest extends TestCase
             ->assertSee('php artisan demo:data');
     }
 
+    public function test_step_6_shows_the_gate_holding(): void
+    {
+        $sections = $this->get('/step-6')->assertOk()->json('sections');
+
+        $this->assertContains('1. every tool, classified', $sections);
+        $this->assertContains('4. the approval now waiting for a human', $sections);
+        $this->assertContains('5. the payment it asked about', $sections);
+    }
+
+    public function test_the_after_approval_view_does_not_reset_the_database(): void
+    {
+        $this->artisan('demo:agent', ['--scenario' => 'refund'])->assertExitCode(0);
+        $this->artisan('demo:approve 1')->assertExitCode(0);
+
+        $this->get('/step-6/after-approval')->assertOk();
+
+        $this->assertNotNull(
+            \App\Models\Payment::findOrFail(301)->refunded_at,
+            'Opening the view must not undo the approval that was just released.'
+        );
+    }
+
     public function test_step_5_shows_the_transcript_and_the_conversation(): void
     {
         $sections = $this->get('/step-5')->assertOk()->json('sections');

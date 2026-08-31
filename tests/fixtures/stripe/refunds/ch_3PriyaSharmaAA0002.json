@@ -1,0 +1,23 @@
+{
+    "id": "re_3PriyaSharmaAA0002",
+    "object": "refund",
+    "amount": 99900,
+    "balance_transaction": "txn_a467237e919868056f503b6b",
+    "charge": "ch_3PriyaSharmaAA0002",
+    "created": 1787310273,
+    "currency": "inr",
+    "destination_details": {
+        "card": {
+            "reference_status": "pending",
+            "reference_type": "acquirer_reference_number",
+            "type": "refund"
+        },
+        "type": "card"
+    },
+    "livemode": false,
+    "metadata": [],
+    "payment_intent": "pi_3PriyaSharmaAA0002",
+    "reason": "duplicate",
+    "receipt_number": null,
+    "status": "succeeded"
+}

@@ -1,0 +1,27 @@
+{
+    "id": "pi_3ArjunMehtaBB0002",
+    "object": "payment_intent",
+    "amount": 149900,
+    "amount_capturable": 0,
+    "amount_received": 149900,
+    "capture_method": "automatic",
+    "client_secret": "pi_3ArjunMehtaBB0002_secret_ZmFrZV9mb3JfYV9tZWV0dXA",
+    "confirmation_method": "automatic",
+    "created": 1786465330,
+    "currency": "inr",
+    "customer": "cus_ArjunMehta01",
+    "description": "ORD-2340 Extra seats, 5 users",
+    "latest_charge": "ch_3ArjunMehtaBB0002",
+    "livemode": false,
+    "metadata": {
+        "order_reference": "ORD-2340",
+        "idempotency_key": "checkout_2026-08-11T16:22:09_e5c744",
+        "client_ip": "103.21.58.44",
+        "submitted_from": "web-checkout"
+    },
+    "payment_method": "pm_ArjunMehtaBB0002",
+    "payment_method_types": [
+        "card"
+    ],
+    "status": "succeeded"
+}

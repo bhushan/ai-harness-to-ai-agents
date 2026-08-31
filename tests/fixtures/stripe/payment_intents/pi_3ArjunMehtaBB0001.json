@@ -1,0 +1,27 @@
+{
+    "id": "pi_3ArjunMehtaBB0001",
+    "object": "payment_intent",
+    "amount": 99900,
+    "amount_capturable": 0,
+    "amount_received": 99900,
+    "capture_method": "automatic",
+    "client_secret": "pi_3ArjunMehtaBB0001_secret_ZmFrZV9mb3JfYV9tZWV0dXA",
+    "confirmation_method": "automatic",
+    "created": 1780398224,
+    "currency": "inr",
+    "customer": "cus_ArjunMehta01",
+    "description": "ORD-1876 Pro plan, annual",
+    "latest_charge": "ch_3ArjunMehtaBB0001",
+    "livemode": false,
+    "metadata": {
+        "order_reference": "ORD-1876",
+        "idempotency_key": "checkout_2026-06-02T11:03:43_4ab190",
+        "client_ip": "103.21.58.44",
+        "submitted_from": "web-checkout"
+    },
+    "payment_method": "pm_ArjunMehtaBB0001",
+    "payment_method_types": [
+        "card"
+    ],
+    "status": "succeeded"
+}

@@ -1,0 +1,64 @@
+{
+    "id": "ch_3VikramNairCC0001",
+    "object": "charge",
+    "amount": 5000000,
+    "amount_captured": 5000000,
+    "amount_refunded": 0,
+    "balance_transaction": "txn_fb94f3deb72213fd59eb6177",
+    "billing_details": {
+        "address": {
+            "city": "Kochi",
+            "country": "IN",
+            "line1": null,
+            "line2": null,
+            "postal_code": null,
+            "state": null
+        },
+        "email": "vikram.nair@example.in",
+        "name": "Vikram Nair",
+        "phone": "+91 90040 77812"
+    },
+    "captured": true,
+    "created": 1787045412,
+    "currency": "inr",
+    "customer": "cus_VikramNair01",
+    "description": "ORD-2402 Enterprise plan, annual",
+    "disputed": false,
+    "livemode": false,
+    "metadata": {
+        "order_reference": "ORD-2402",
+        "idempotency_key": "invoice_2026-08-18T09:30:11_77b2fe"
+    },
+    "outcome": {
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 5,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+    },
+    "paid": true,
+    "payment_intent": "pi_3VikramNairCC0001",
+    "payment_method": "pm_VikramNairCC0001",
+    "payment_method_details": {
+        "card": {
+            "brand": "amex",
+            "country": "IN",
+            "exp_month": 11,
+            "exp_year": 2029,
+            "funding": "credit",
+            "last4": "0005",
+            "network": "amex",
+            "three_d_secure": {
+                "authentication_flow": "challenge",
+                "result": "authenticated",
+                "version": "2.2.0"
+            },
+            "wallet": null
+        },
+        "type": "card"
+    },
+    "receipt_url": "https://pay.stripe.com/receipts/ch_3VikramNairCC0001/rcpt_ef814a0d39f585822916",
+    "refunded": false,
+    "status": "succeeded"
+}

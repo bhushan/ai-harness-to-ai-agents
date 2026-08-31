@@ -1,0 +1,64 @@
+{
+    "id": "ch_3ArjunMehtaBB0001",
+    "object": "charge",
+    "amount": 99900,
+    "amount_captured": 99900,
+    "amount_refunded": 0,
+    "balance_transaction": "txn_6f46c27d827fb1040216859f",
+    "billing_details": {
+        "address": {
+            "city": "Pune",
+            "country": "IN",
+            "line1": null,
+            "line2": null,
+            "postal_code": null,
+            "state": null
+        },
+        "email": "arjun.mehta@example.in",
+        "name": "Arjun Mehta",
+        "phone": "+91 99300 55440"
+    },
+    "captured": true,
+    "created": 1780398224,
+    "currency": "inr",
+    "customer": "cus_ArjunMehta01",
+    "description": "ORD-1876 Pro plan, annual",
+    "disputed": false,
+    "livemode": false,
+    "metadata": {
+        "order_reference": "ORD-1876",
+        "idempotency_key": "checkout_2026-06-02T11:03:43_4ab190"
+    },
+    "outcome": {
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 8,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+    },
+    "paid": true,
+    "payment_intent": "pi_3ArjunMehtaBB0001",
+    "payment_method": "pm_ArjunMehtaBB0001",
+    "payment_method_details": {
+        "card": {
+            "brand": "mastercard",
+            "country": "IN",
+            "exp_month": 11,
+            "exp_year": 2029,
+            "funding": "credit",
+            "last4": "1881",
+            "network": "mastercard",
+            "three_d_secure": {
+                "authentication_flow": "challenge",
+                "result": "authenticated",
+                "version": "2.2.0"
+            },
+            "wallet": null
+        },
+        "type": "card"
+    },
+    "receipt_url": "https://pay.stripe.com/receipts/ch_3ArjunMehtaBB0001/rcpt_670896553c75b66201e9",
+    "refunded": false,
+    "status": "succeeded"
+}

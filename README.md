@@ -1,58 +1,75 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# From AI harness to AI agents
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel demo repository for a talk of the same name. It runs completely
+offline: every model response and every payment gateway response is served from
+a committed fixture, so the same command prints the same output every time.
 
-## About Laravel
+**One branch per teaching step.** Each branch builds on the previous one and
+adds exactly one idea, one command, and one section to this README.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+| Branch | Command |
+| --- | --- |
+| `step-0-setup` | `php artisan demo:data` |
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Setup, once
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan demo:data
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+No API key is required. An absent `ANTHROPIC_API_KEY` is the normal state here.
 
-## Contributing
+## Two ways to watch it
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Every step has a command and a route, and they show different things.
 
-## Code of Conduct
+```bash
+php artisan demo:data       # the story, in sequence, in the terminal
+php artisan serve           # then open http://localhost:8000
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+The commands are the narrative: step counters, iterations, the loop unfolding.
+The routes are the hood: each one `dd()`s the payloads, the objects and the
+database rows behind that step, so a request body can be expanded and collapsed
+at the speed of the room. `routes/web.php` grows by one route per branch, so on
+any branch it reads as a table of contents for the talk so far.
 
-## Security Vulnerabilities
+## Step 0: setup
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+**What this step demonstrates.** The plumbing that makes an offline demo
+honest. The database holds a real billing scenario, and both outside worlds
+this application talks to (the model, and Stripe) are fixture backed, with no
+HTTP implementation anywhere in the repository.
 
-## License
+**Run it.**
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+php artisan demo:data
+```
+
+**What the audience should notice.**
+
+- Priya Sharma has two successful payments of ₹999 against one order,
+  three seconds apart. That is the double charge the rest of the talk
+  investigates.
+- Arjun Mehta also has two payments, but against two different orders seventy
+  days apart. Same shape of data, completely different answer.
+- Nothing here calls the network. `App\AI\Transport\FixtureTransport` reads
+  numbered files from `tests/fixtures/llm/` in call order, and
+  `App\Billing\FixtureStripeGateway` reads real-shaped Stripe objects from
+  `tests/fixtures/stripe/`. A missing fixture stops the run with a message
+  naming the scenario, the call index, and the file it expected.
+
+## Before going on stage
+
+```bash
+php artisan demo:verify
+php artisan test
+```
+
+`demo:verify` runs every demo command available on the current branch against
+the fixtures and asserts the lines the talk depends on. Commands that belong to
+later branches are reported as skipped, not as failures.

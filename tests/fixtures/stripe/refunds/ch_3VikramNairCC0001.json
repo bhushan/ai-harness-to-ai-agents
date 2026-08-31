@@ -1,0 +1,23 @@
+{
+    "id": "re_3VikramNairCC0001",
+    "object": "refund",
+    "amount": 5000000,
+    "balance_transaction": "txn_521c7fd58770eb8389a323bc",
+    "charge": "ch_3VikramNairCC0001",
+    "created": 1787310472,
+    "currency": "inr",
+    "destination_details": {
+        "card": {
+            "reference_status": "pending",
+            "reference_type": "acquirer_reference_number",
+            "type": "refund"
+        },
+        "type": "card"
+    },
+    "livemode": false,
+    "metadata": [],
+    "payment_intent": "pi_3VikramNairCC0001",
+    "reason": "requested_by_customer",
+    "receipt_number": null,
+    "status": "succeeded"
+}

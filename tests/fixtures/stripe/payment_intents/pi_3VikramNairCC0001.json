@@ -1,0 +1,27 @@
+{
+    "id": "pi_3VikramNairCC0001",
+    "object": "payment_intent",
+    "amount": 5000000,
+    "amount_capturable": 0,
+    "amount_received": 5000000,
+    "capture_method": "automatic",
+    "client_secret": "pi_3VikramNairCC0001_secret_ZmFrZV9mb3JfYV9tZWV0dXA",
+    "confirmation_method": "automatic",
+    "created": 1787045412,
+    "currency": "inr",
+    "customer": "cus_VikramNair01",
+    "description": "ORD-2402 Enterprise plan, annual",
+    "latest_charge": "ch_3VikramNairCC0001",
+    "livemode": false,
+    "metadata": {
+        "order_reference": "ORD-2402",
+        "idempotency_key": "invoice_2026-08-18T09:30:11_77b2fe",
+        "client_ip": "117.216.14.90",
+        "submitted_from": "invoice-link"
+    },
+    "payment_method": "pm_VikramNairCC0001",
+    "payment_method_types": [
+        "card"
+    ],
+    "status": "succeeded"
+}

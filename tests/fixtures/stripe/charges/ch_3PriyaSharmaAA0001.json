@@ -1,0 +1,64 @@
+{
+    "id": "ch_3PriyaSharmaAA0001",
+    "object": "charge",
+    "amount": 99900,
+    "amount_captured": 99900,
+    "amount_refunded": 0,
+    "balance_transaction": "txn_5c2c383df59599ef1ba8467d",
+    "billing_details": {
+        "address": {
+            "city": "Nagpur",
+            "country": "IN",
+            "line1": null,
+            "line2": null,
+            "postal_code": null,
+            "state": null
+        },
+        "email": "priya.sharma@example.in",
+        "name": "Priya Sharma",
+        "phone": "+91 98200 11223"
+    },
+    "captured": true,
+    "created": 1787134502,
+    "currency": "inr",
+    "customer": "cus_PriyaSharma01",
+    "description": "ORD-2201 Pro plan, annual",
+    "disputed": false,
+    "livemode": false,
+    "metadata": {
+        "order_reference": "ORD-2201",
+        "idempotency_key": "checkout_2026-08-19T10:15:01_9f21ab"
+    },
+    "outcome": {
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 12,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+    },
+    "paid": true,
+    "payment_intent": "pi_3PriyaSharmaAA0001",
+    "payment_method": "pm_PriyaSharmaAA000",
+    "payment_method_details": {
+        "card": {
+            "brand": "visa",
+            "country": "IN",
+            "exp_month": 11,
+            "exp_year": 2029,
+            "funding": "credit",
+            "last4": "4242",
+            "network": "visa",
+            "three_d_secure": {
+                "authentication_flow": "challenge",
+                "result": "authenticated",
+                "version": "2.2.0"
+            },
+            "wallet": null
+        },
+        "type": "card"
+    },
+    "receipt_url": "https://pay.stripe.com/receipts/ch_3PriyaSharmaAA0001/rcpt_24d14f312597901378bc",
+    "refunded": false,
+    "status": "succeeded"
+}
